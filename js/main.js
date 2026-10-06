@@ -19,6 +19,7 @@ let balance = Number.isFinite(saved.balance) ? Math.max(0, saved.balance) : 2500
 let collection = new BallCollection(saved.collection);
 let history = Array.isArray(saved.history) ? saved.history.slice(0, 12) : [];
 let previousBets = Array.isArray(saved.previousBets) ? saved.previousBets : [];
+let physicsTuning = saved.physics && typeof saved.physics === "object" ? saved.physics : {};
 let currentChip = 5;
 let minimum = 5;
 let bets = [];
@@ -57,7 +58,7 @@ for (let number = 1; number <= 36; number++) {
 
 function save() {
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify({ balance, collection: collection.serialize(), history, previousBets }));
+    localStorage.setItem(STORE_KEY, JSON.stringify({ balance, collection: collection.serialize(), history, previousBets, physics: physicsTuning }));
   } catch { showToast("Your private ledger could not be written to this browser."); }
 }
 
@@ -284,6 +285,8 @@ function finishRound(number) {
   $("#bet-hint").textContent = net > 0 ? `A pleasing turn: F ${formatMoney(returned)} paid to your purse.` : net < 0 ? "The croupier gathers the losing stakes. Place your next hand." : "No stake on the winning number. The table is open.";
   showLastResult(entry);
   renderHistory();
+  document.querySelectorAll(".winning-cell").forEach(cell => cell.classList.remove("winning-cell"));
+  document.querySelector(`[data-number="${number}"]`)?.classList.add("winning-cell");
   if (reducedMotion) canvas.closest(".wheel-frame").classList.add("winner-flash");
   window.setTimeout(() => canvas.closest(".wheel-frame").classList.remove("winner-flash"), 800);
   updateBetDisplay();
@@ -296,9 +299,12 @@ function beginSpin() {
     return;
   }
   previousBets = bets.map(({ type, label, attribute, numbers, stake }) => ({ type, label, attribute, numbers, stake }));
-  simulation = new RoulettePhysics(collection.active.physics);
+  simulation = new RoulettePhysics({ ...collection.active.physics, ...physicsTuning });
   finalized = false;
   lastFrame = 0;
+  animate.lastHits = 0;
+  animate.saidSettle = false;
+  document.querySelectorAll(".winning-cell").forEach(cell => cell.classList.remove("winning-cell"));
   dealer.work(true);
   dealer.announce("noMoreBets");
   setPhase("spinning", "BALL IN MOTION");
@@ -314,7 +320,7 @@ function animate(now) {
   if (simulation) {
     simulation.update(dt);
     const snapshot = simulation.snapshot();
-    renderer.draw(snapshot, now, reducedMotion);
+    renderer.draw(snapshot, now, reducedMotion, collection.active);
     if (snapshot.hits > (animate.lastHits || 0)) {
       sound.impact(.6);
       animate.lastHits = snapshot.hits;
@@ -341,7 +347,7 @@ function animate(now) {
     }
   } else {
     const idle = now * .000012;
-    renderer.draw({ angle: -Math.PI / 2, rotor: idle, radius: .91, height: .7, events: [] }, now, reducedMotion);
+    renderer.draw({ angle: -Math.PI / 2, rotor: idle, radius: .91, height: .7, events: [] }, now, reducedMotion, collection.active);
   }
   requestAnimationFrame(animate);
 }
@@ -430,6 +436,23 @@ $("#limits").addEventListener("change", event => {
   $("#bet-hint").textContent = `Table minimum is now F ${minimum}.`;
 });
 reducedMotionInput.addEventListener("change", event => { reducedMotion = event.target.checked; });
+
+const tuningControls = [
+  { key: "friction", input: $("#friction-setting"), output: $("#friction-value"), initial: .18 },
+  { key: "restitution", input: $("#restitution-setting"), output: $("#restitution-value"), initial: .57 },
+  { key: "deflectorStrength", input: $("#deflector-setting"), output: $("#deflector-value"), initial: 1 },
+];
+for (const control of tuningControls) {
+  const value = Number.isFinite(physicsTuning[control.key]) ? physicsTuning[control.key] : control.initial;
+  control.input.value = String(value);
+  physicsTuning[control.key] = Number(control.input.value);
+  control.output.value = Number(control.input.value).toFixed(2);
+  control.input.addEventListener("input", () => {
+    physicsTuning[control.key] = Number(control.input.value);
+    control.output.value = Number(control.input.value).toFixed(2);
+    save();
+  });
+}
 
 renderHistory();
 updateBalance();

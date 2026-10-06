@@ -4,12 +4,15 @@ export class SalonSound {
     this.enabled = false;
     this.ambience = null;
     this.master = null;
+    this.pianoTimer = null;
   }
 
   async toggle() {
     this.enabled = !this.enabled;
     if (!this.enabled) {
       if (this.master && this.context) this.master.gain.setTargetAtTime(0, this.context.currentTime, .15);
+      window.clearTimeout(this.pianoTimer);
+      this.pianoTimer = null;
       return this.enabled;
     }
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -24,6 +27,7 @@ export class SalonSound {
     this.master.connect(this.context.destination);
     if (!this.ambience) this.createAmbience();
     else this.master.gain.setTargetAtTime(.2, this.context.currentTime, .2);
+    this.startPianoLoop();
     return this.enabled;
   }
 
@@ -43,6 +47,18 @@ export class SalonSound {
     noise.connect(filter).connect(gain).connect(this.master);
     noise.start();
     this.ambience = noise;
+  }
+
+  startPianoLoop() {
+    if (this.pianoTimer) return;
+    const phrases = [[261.63, 329.63, 392], [220, 261.63, 329.63], [196, 246.94, 293.66], [233.08, 293.66, 349.23]];
+    const playPhrase = () => {
+      if (!this.enabled) return;
+      const notes = phrases[Math.floor(Math.random() * phrases.length)];
+      notes.forEach((note, index) => this.tone(note, 1.9 + index * .2, "sine", .009, -note * .025));
+      this.pianoTimer = window.setTimeout(playPhrase, 7800 + Math.random() * 5000);
+    };
+    this.pianoTimer = window.setTimeout(playPhrase, 2200);
   }
 
   tone(frequency, duration, type = "sine", gainValue = .08, slide = 0) {

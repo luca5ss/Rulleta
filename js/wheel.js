@@ -45,7 +45,7 @@ export class WheelRenderer {
     this.size = rect.width * scale;
   }
 
-  draw(state, now = 0, reducedMotion = false) {
+  draw(state, now = 0, reducedMotion = false, appearance = { id: "ivory" }) {
     const ctx = this.ctx;
     const size = this.size || this.canvas.width;
     const center = size / 2;
@@ -59,7 +59,7 @@ export class WheelRenderer {
     this.drawWood(ctx);
     this.drawTrack(ctx, now);
     this.drawRotor(ctx, state.rotor, reducedMotion);
-    this.drawBall(ctx, state, now, reducedMotion);
+    this.drawBall(ctx, state, now, reducedMotion, appearance);
     this.drawImpacts(ctx, state.events, now, reducedMotion);
     ctx.restore();
   }
@@ -148,16 +148,33 @@ export class WheelRenderer {
     ctx.beginPath();ctx.arc(-5,-8,3,0,TAU);ctx.fillStyle="#fff3cf";ctx.fill();
   }
 
-  drawBall(ctx, state, now, reducedMotion) {
+  drawBall(ctx, state, now, reducedMotion, appearance) {
     const r=state.radius*285;
     const x=Math.cos(state.angle)*r, y=Math.sin(state.angle)*r-state.height*25;
+    const ballStyle = {
+      ivory: ["#fffced", "#e9d9b5", "#b8a27c", "#776246"],
+      gold: ["#fff0a8", "#e0b34f", "#a96b1e", "#694013"],
+      diamond: ["#ffffff", "#d8f5ff", "#81b8c4", "#467685"],
+      ruby: ["#ffd2bd", "#e2564b", "#971e2e", "#51121d"],
+      emerald: ["#e2ffe0", "#5fc37a", "#176542", "#0a362a"],
+      sapphire: ["#e2f2ff", "#568fe0", "#214983", "#111e42"],
+      obsidian: ["#eee8d9", "#756b5a", "#29231e", "#080808"],
+    }[appearance.id] || ["#fffced", "#e9d9b5", "#b8a27c", "#776246"];
     const speed=Math.abs(state.angle-(this.previousAngle??state.angle));
     this.previousAngle=state.angle;
     ctx.save();
-    if(!reducedMotion&&speed>.035){ctx.globalAlpha=Math.min(.26,speed*1.3);for(let i=1;i<=3;i++){ctx.beginPath();ctx.arc(Math.cos(state.angle-speed*i*1.7)*r,Math.sin(state.angle-speed*i*1.7)*r-state.height*25,10-i*1.5,0,TAU);ctx.fillStyle="#fff0cf";ctx.fill()}}
+    if(!reducedMotion&&speed>.035){ctx.globalAlpha=Math.min(.26,speed*1.3);for(let i=1;i<=3;i++){ctx.beginPath();ctx.arc(Math.cos(state.angle-speed*i*1.7)*r,Math.sin(state.angle-speed*i*1.7)*r-state.height*25,10-i*1.5,0,TAU);ctx.fillStyle=ballStyle[1];ctx.fill()}}
     ctx.beginPath();ctx.ellipse(x+4,y+9,12,7,0,0,TAU);ctx.fillStyle="#0009";ctx.fill();
-    const shade=ctx.createRadialGradient(x-4,y-5,1,x,y,12);shade.addColorStop(0,"#fffced");shade.addColorStop(.43,"#e9d9b5");shade.addColorStop(.8,"#b8a27c");shade.addColorStop(1,"#776246");
+    const shade=ctx.createRadialGradient(x-4,y-5,1,x,y,12);shade.addColorStop(0,ballStyle[0]);shade.addColorStop(.43,ballStyle[1]);shade.addColorStop(.8,ballStyle[2]);shade.addColorStop(1,ballStyle[3]);
     ctx.beginPath();ctx.arc(x,y,11,0,TAU);ctx.fillStyle=shade;ctx.fill();ctx.strokeStyle="#fff0ca";ctx.lineWidth=1.2;ctx.stroke();
+    if(appearance.id==="diamond"){
+      ctx.beginPath();ctx.moveTo(x,y-7);ctx.lineTo(x+6,y);ctx.lineTo(x,y+7);ctx.lineTo(x-6,y);ctx.closePath();ctx.strokeStyle="#fff";ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x-5,y-3);ctx.lineTo(x+5,y+3);ctx.moveTo(x+4,y-5);ctx.lineTo(x-4,y+5);ctx.stroke();
+    } else if(appearance.id==="gold") {
+      ctx.beginPath();ctx.arc(x,y,5,Math.PI*.15,Math.PI*1.2);ctx.strokeStyle="#fff0af";ctx.lineWidth=1;ctx.stroke();
+    } else if(["ruby","emerald","sapphire","obsidian"].includes(appearance.id)) {
+      ctx.beginPath();ctx.moveTo(x,y-7);ctx.lineTo(x+5,y-1);ctx.lineTo(x+2,y+6);ctx.lineTo(x-5,y+3);ctx.lineTo(x-4,y-4);ctx.closePath();ctx.strokeStyle="#ffffff9c";ctx.lineWidth=.9;ctx.stroke();
+    }
     ctx.beginPath();ctx.ellipse(x-4,y-5,3.6,2.1,-.5,0,TAU);ctx.fillStyle="#fff";ctx.fill();
     ctx.restore();
   }

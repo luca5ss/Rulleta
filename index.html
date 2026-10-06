@@ -125,6 +125,9 @@
       <div class="modal-kicker">HOUSE PREFERENCES</div><h2 id="settings-title">At your leisure</h2>
       <label class="setting-row"><span><strong>Table limits</strong><small>Choose a comfortable stake</small></span><select id="limits"><option value="5">Minimum F 5</option><option value="25">Minimum F 25</option><option value="100">Minimum F 100</option></select></label>
       <label class="setting-row"><span><strong>Reduced motion</strong><small>Soften the wheel animation</small></span><input id="reduced-motion" type="checkbox"></label>
+      <label class="setting-row range-setting"><span><strong>Wheel friction</strong><small>Ball deceleration on the outer track</small></span><input id="friction-setting" type="range" min="0.05" max="0.4" step="0.01" aria-label="Wheel friction"><output id="friction-value"></output></label>
+      <label class="setting-row range-setting"><span><strong>Bounce restitution</strong><small>Energy retained at each impact</small></span><input id="restitution-setting" type="range" min="0.25" max="0.9" step="0.01" aria-label="Bounce restitution"><output id="restitution-value"></output></label>
+      <label class="setting-row range-setting"><span><strong>Deflector strength</strong><small>Brass-fret impulse strength</small></span><input id="deflector-setting" type="range" min="0.4" max="1.6" step="0.05" aria-label="Deflector strength"><output id="deflector-value"></output></label>
       <p class="rules-copy">This is a complimentary salon simulation. Bets use the purse shown on the table; single-zero European roulette pays 35:1 on a straight win. No purchase or real currency is involved.</p>
     </section>
   </div>
