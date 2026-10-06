@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#180d09">
+  <meta name="description" content="A private 1900s roulette salon. Place your wagers and follow the ivory ball.">
+  <title>The Rulleta Salon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <div class="room-grain" aria-hidden="true"></div>
+  <header class="masthead">
+    <a class="brand" href="#salon" aria-label="The Rulleta Salon home">
+      <span class="brand-mark" aria-hidden="true">R</span>
+      <span><span class="brand-name">The Rulleta Salon</span><span class="brand-caption">A private gaming room · Est. 1901</span></span>
+    </a>
+    <div class="masthead-center"><span class="open-dot"></span><span id="table-status">TABLE OPEN</span><span class="status-divider"></span><span>EUROPEAN ROULETTE</span></div>
+    <div class="header-actions">
+      <div class="balance"><span class="balance-label">YOUR PURSE</span><strong id="balance">2,500</strong><span class="currency">F</span></div>
+      <button class="icon-button" id="sound-toggle" type="button" aria-label="Enable salon sounds" title="Enable salon sounds">♪</button>
+      <button class="icon-button" id="settings-toggle" type="button" aria-label="Open settings" title="Settings">⚙</button>
+    </div>
+  </header>
+
+  <main id="salon" class="salon-shell">
+    <section class="stage" aria-label="Roulette wheel and dealer">
+      <div class="stage-topline"><span>THE GRAND SALON</span><span class="ornament">✳ &nbsp; ✳ &nbsp; ✳</span><span>MONTE CARLO · 11:42 PM</span></div>
+      <div class="stage-grid">
+        <div class="wheel-column">
+          <div class="wheel-heading"><span class="eyebrow">THE WHEEL</span><span class="wheel-subtitle">Hand-turned mahogany · Single zero</span></div>
+          <div class="wheel-frame" id="wheel-frame">
+            <div class="wheel-shine" aria-hidden="true"></div>
+            <canvas id="wheel" width="720" height="720" aria-label="Animated European roulette wheel"></canvas>
+            <div class="wheel-rim-label">CASINO DE MONTE-CARLO</div>
+          </div>
+          <div class="wheel-legend"><span><i class="legend-dot ivory-dot"></i>IVORY BALL</span><span><i class="legend-dot brass-dot"></i>37 POCKETS</span><span><i class="legend-dot green-dot"></i>SINGLE ZERO</span></div>
+        </div>
+
+        <aside class="dealer-column" aria-label="Croupier and table information">
+          <div class="dealer-portrait" id="dealer" aria-hidden="true">
+            <div class="portrait-halo"></div><div class="dealer-curtain"></div>
+            <div class="dealer-head"><div class="hair-cap"></div><div class="face"><i class="eye eye-left"></i><i class="eye eye-right"></i><i class="nose"></i><i class="moustache"></i></div></div>
+            <div class="dealer-shirt"></div><div class="dealer-waistcoat"></div><div class="bowtie"></div>
+            <div class="dealer-arm arm-left"></div><div class="dealer-arm arm-right"></div><div class="rake-prop"><span></span><span></span><span></span><span></span></div>
+            <div class="portrait-plaque">M. BEAUMONT <span>CHEF DE TABLE</span></div>
+          </div>
+          <div class="dealer-quote"><span class="quote-mark">“</span><p id="dealer-line">Place your wagers, if you please.</p><span class="quote-rule"></span><span class="dealer-signature">Your croupier</span></div>
+          <div class="result-panel">
+            <div class="panel-heading"><span>THE LAST SPIN</span><button class="text-button" id="history-toggle" type="button">LEDGER ↗</button></div>
+            <div class="last-result" id="last-result"><span class="result-empty">Awaiting the first turn</span></div>
+            <div class="history-row" id="history" aria-label="Recent results"></div>
+          </div>
+          <button class="shop-trigger" id="shop-open" type="button"><span class="shop-emblem">✧</span><span><strong>THE BALL SALON</strong><small>Rare ivory, gold & precious stones</small></span><span class="shop-arrow">↗</span></button>
+        </aside>
+      </div>
+      <div class="stage-caption"><span>THE ROUE TOURNE</span><span>FORTUNE FAVOURS THE PATIENT</span><span>NO. 17, PLACE DU CASINO</span></div>
+    </section>
+
+    <section class="table-section" aria-label="Betting table">
+      <div class="table-topline"><div><span class="eyebrow">PLACE YOUR WAGERS</span><span class="felt-caption">All bets are placed in francs · Minimum F 5</span></div><div class="round-readout"><span class="round-light" id="phase-light"></span><span id="phase-label">PLACE YOUR BETS</span><span id="countdown" class="countdown"></span></div></div>
+      <div class="bet-controls">
+        <div class="denominations" role="group" aria-label="Chip denomination">
+          <span class="control-label">CHIP</span>
+          <button class="chip-select active" data-value="5" type="button" aria-pressed="true"><span class="chip-coin chip-5">5</span></button>
+          <button class="chip-select" data-value="25" type="button" aria-pressed="false"><span class="chip-coin chip-25">25</span></button>
+          <button class="chip-select" data-value="100" type="button" aria-pressed="false"><span class="chip-coin chip-100">100</span></button>
+          <button class="chip-select" data-value="500" type="button" aria-pressed="false"><span class="chip-coin chip-500">500</span></button>
+        </div>
+        <label class="bet-kind-label" for="bet-kind">WAGER TYPE</label>
+        <select id="bet-kind" class="bet-kind">
+          <option value="straight">Straight · 35:1</option><option value="split">Split · 17:1</option><option value="street">Street · 11:1</option><option value="corner">Corner · 8:1</option><option value="sixline">Six line · 5:1</option>
+        </select>
+        <div class="table-actions"><button class="quiet-button" id="undo-bet" type="button" title="Remove the latest wager">UNDO</button><button class="quiet-button" id="clear-bets" type="button">CLEAR</button><button class="spin-button" id="spin" type="button"><span class="spin-star">✧</span><span>SPIN THE WHEEL</span><span class="spin-arrow">→</span></button></div>
+      </div>
+      <p class="bet-hint" id="bet-hint" aria-live="polite">Choose a chip, then select a number on the cloth.</p>
+      <div class="felt-board" id="felt-board">
+        <div class="felt-rail"><span>✦</span><span>LE GRAND JEU</span><span>✦</span></div>
+        <div class="layout-wrap">
+          <button class="zero-cell number-cell green-cell" data-number="0" type="button" aria-label="Straight bet on zero">0</button>
+          <div class="number-grid" id="number-grid" aria-label="Roulette numbers"></div>
+          <div class="column-bets">
+            <button class="bet-cell outside-cell" data-bet="column" data-column="2" type="button">2 TO 1</button>
+            <button class="bet-cell outside-cell" data-bet="column" data-column="1" type="button">2 TO 1</button>
+            <button class="bet-cell outside-cell" data-bet="column" data-column="0" type="button">2 TO 1</button>
+          </div>
+        </div>
+        <div class="dozen-row">
+          <button class="bet-cell outside-cell" data-bet="dozen" data-dozen="1" type="button">1ST 12</button><button class="bet-cell outside-cell" data-bet="dozen" data-dozen="2" type="button">2ND 12</button><button class="bet-cell outside-cell" data-bet="dozen" data-dozen="3" type="button">3RD 12</button>
+        </div>
+        <div class="even-row">
+          <button class="bet-cell outside-cell" data-bet="low" type="button">1—18</button><button class="bet-cell outside-cell" data-bet="even" type="button">EVEN</button><button class="bet-cell red-bet" data-bet="red" type="button"><i></i> RED</button><button class="bet-cell black-bet" data-bet="black" type="button"><i></i> BLACK</button><button class="bet-cell outside-cell" data-bet="odd" type="button">ODD</button><button class="bet-cell outside-cell" data-bet="high" type="button">19—36</button>
+        </div>
+        <div class="felt-foot"><span>FAITES VOS JEUX</span><span class="foot-diamond">◆</span><span>RIEN NE VA PLUS</span><span class="foot-diamond">◆</span><span>1870 · 1901</span></div>
+      </div>
+      <div class="wager-summary"><span><span class="summary-glyph">◈</span> ON THE CLOTH <strong id="wager-total">F 0</strong></span><span class="summary-note" id="wager-count">No wagers placed</span><button id="repeat-bets" class="text-button" type="button" disabled>REPEAT LAST HAND ↻</button></div>
+    </section>
+    <footer class="footer-note"><span>EUROPEAN SINGLE-ZERO · HOUSE RULES APPLY</span><span>PLAY FOR PLEASURE · NOT FOR PROFIT</span><button id="rules-open" type="button">HOUSE RULES</button></footer>
+  </main>
+
+  <div class="modal-backdrop" id="shop-modal" hidden>
+    <section class="salon-modal shop-modal" role="dialog" aria-modal="true" aria-labelledby="shop-title">
+      <button class="modal-close" data-close="shop-modal" type="button" aria-label="Close ball salon">×</button>
+      <div class="modal-kicker">THE PRIVATE COLLECTION · ESTABLISHED 1884</div><h2 id="shop-title">The Ball Salon</h2><p class="modal-intro">A finer sphere for a more singular fortune.</p>
+      <div class="shop-grid" id="shop-grid"></div>
+      <div class="modal-bottom"><span>Acquisitions are kept in your private ledger.</span><span>YOUR PURSE <strong id="shop-balance">F 2,500</strong></span></div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="history-modal" hidden>
+    <section class="salon-modal ledger-modal" role="dialog" aria-modal="true" aria-labelledby="history-title">
+      <button class="modal-close" data-close="history-modal" type="button" aria-label="Close ledger">×</button>
+      <div class="modal-kicker">PRIVATE TABLE RECORDS · 1901</div><h2 id="history-title">The Ledger</h2><p class="modal-intro">The last twelve turns of the wheel.</p>
+      <div class="ledger-list" id="ledger-list"></div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="settings-modal" hidden>
+    <section class="salon-modal settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <button class="modal-close" data-close="settings-modal" type="button" aria-label="Close settings">×</button>
+      <div class="modal-kicker">HOUSE PREFERENCES</div><h2 id="settings-title">At your leisure</h2>
+      <label class="setting-row"><span><strong>Table limits</strong><small>Choose a comfortable stake</small></span><select id="limits"><option value="5">Minimum F 5</option><option value="25">Minimum F 25</option><option value="100">Minimum F 100</option></select></label>
+      <label class="setting-row"><span><strong>Reduced motion</strong><small>Soften the wheel animation</small></span><input id="reduced-motion" type="checkbox"></label>
+      <p class="rules-copy">This is a complimentary salon simulation. Bets use the purse shown on the table; single-zero European roulette pays 35:1 on a straight win. No purchase or real currency is involved.</p>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
